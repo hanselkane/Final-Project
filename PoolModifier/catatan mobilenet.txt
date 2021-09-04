@@ -1,0 +1,51 @@
+pyrcc5 -o C:/Hansel/labelImg-master/libs/resources.py resources.qrc
+
+py -3.6 labelImg.py C:\Hansel\TidurMix\TdrMix9
+
+py -3.6 "C:/Hansel/TidurMixFalsePosFull/generate_tfrecord.py" --csv_input="C:/Hansel/TidurMixFalsePosFull/TdrMixPool_labels.csv" --image_dir="C:/Hansel/TidurMixFalsePosFull/TdrMixPool" --output_path="C:/Hansel/TidurMixFalsePosFull/trainfalsefull.record"
+
+py -3.6 C:/Hansel/Nonoccluded/generate_tfrecord.py --csv_input=C:/Hansel/Nonoccluded/TestTdrMixPool_labels.csv --image_dir=C:/Hansel/Nonoccluded/test --output_path=C:/Hansel/Nonoccluded/test.record
+
+py -3.6 C:/Users/Windows/AppData/Local/Programs/Python/Python36/Lib/site-packages/tensorflow/models/research/object_detection/legacy/eval.py --logtostderr --eval_dir=C:/Hansel/mlsmall/validfull --pipeline_config_path=C:/Hansel/mlsmall/pipeline.config --checkpoint_dir=C:/Hansel/mlsmall/
+
+tensorboard --logdir=C:\Hansel\mlsmall --host localhost --port 8080 --reload_multifile True
+
+
+
+py -3.6 export_tflite_ssd_graph.py --pipeline_config_path=C:/Users/Windows/TensorFlow-Object-Detection-API-Tutorial-Train-Multiple-Objects-Windows-10/mobilenetv2.config --trained_checkpoint_prefix=C:/Users/Windows/TensorFlow-Object-Detection-API-Tutorial-Train-Multiple-Objects-Windows-10/hasiltraining/model.ckpt-0 --output_directory=C:/Users/Windows/TensorFlow-Object-Detection-API-Tutorial-Train-Multiple-Objects-Windows-10/hasilmodel/ --add_postprocessing_op=true
+
+
+"baru"
+py -3.6 export_tflite_ssd_graph.py --pipeline_config_path=C:/Users/Windows/TensorFlow-Object-Detection-API-Tutorial-Train-Multiple-Objects-Windows-10/hasiltraining/pipeline.config --trained_checkpoint_prefix="C:/Users/Windows/TensorFlow-Object-Detection-API-Tutorial-Train-Multiple-Objects-Windows-10/hasiltraining/model.ckpt-20" --output_directory=C:/Users/Windows/TensorFlow-Object-Detection-API-Tutorial-Train-Multiple-Objects-Windows-10/hasilmodel/ --add_postprocessing_op=true
+
+
+"mnet3small"
+py -3.6 C:/Hansel/ModelmasterBaru/models-master/research/object_detection/train.py --logtostderr -train_dir=C:/Hansel/mlsmall --pipeline_config_path=C:/Hansel/mlsmall/pipeline.config
+  
+py -3.6 C:/Hansel/ModelmasterBaru/models-master/research/object_detection/export_tflite_ssd_graph.py --pipeline_config_path=C:/Hansel/Mfull/pipeline.config --trained_checkpoint_prefix="C:/Hansel/Mfull/model.ckpt-789238" --output_directory=C:/Hansel/Mfull --add_postprocessing_op=true
+
+bazel run --host_copt="-latomic" --host_linkopt="-latomic" --linkopt="-latomic" -c opt tensorflow/lite/toco:toco -- --input_file=C:/Hansel/Mfull/tflite_graph.pb --output_file=C:/Hansel/Mfull/detectMHalf.tflite --input_shapes=1,300,300,3 --input_arrays=normalized_input_image_tensor --output_arrays=TFLite_Detection_PostProcess,TFLite_Detection_PostProcess:1,TFLite_Detection_PostProcess:2,TFLite_Detection_PostProcess:3 --inference_type=QUANTIZED_UINT8 --mean_values=127.5 --std_values=127.5 --change_concat_input_ranges=false --allow_custom_ops
+
+
+py -3.6 C:/Hansel/ModelmasterBaru/models-master/research/object_detection/model_main.py --pipeline_config_path=C:/Hansel/mlsmallFalseBackFullTrial/pipeline.config --model_dir=C:/Hansel/mlsmallFalseBackFullTrial --sample_1_of_n_eval_examples=1 --eval_training_data=False --checkpoint_dir=C:/Hansel/mlsmallFalseBackFullTrial --run_once=True --alsologtostderr
+""""""""""""""""""""""""""""
+train_image_classifier.py \ --train_dir=/content/data/train \ --dataset_dir=/content/data/flowers \ --dataset_name=flowers \ --dataset_split_name=train \ --model_name=mobilenet_v3_large \
+    --max_number_of_steps=2000 \ --batch_size=32 \ --learning_rate=0.01 \ --learning_rate_decay_type=fixed \ --save_interval_secs=60 \ --save_summaries_secs=60 \
+    --log_every_n_steps=20 \ --optimizer=sgd \ --weight_decay=0.00004 \ --quantize_delay=1000 \ --train_image_size=224 \ --checkpoint_path=/content/data/v3-large_224_1.0_uint8/ema/model-2790693 \ --checkpoint_exclude_scopes=MobilenetV3/Logits
+
+bazel build tensorflow/python/tools:freeze_graph
+bazel-bin/tensorflow/python/tools/freeze_graph \  --input_graph=C:/Hansel/ \  --input_checkpoint=C:/Hansel/mlsmall/model.ckpt-400002 \  --input_binary=true \  --output_graph=C:/Hansel/mlsmall/frozen_graphsss.pb \  --output_node_names=MobilenetV3/Predictions/Softmax --saved_model_tags='serve'
+
+tflite_convert \ --output_file=C:/Hansel/models-mobiledets/output/output_tflite_graph.tflite \  --graph_def_file=C:/Hansel/mlsmall/tflite_graph.pb \  --inference_type=QUANTIZED_UINT8 \  --input_arrays=input \  --output_arrays=MobilenetV3/Predictions/Softmax \ --mean_values=128 \  --std_dev_values=128 \  --input_shapes=1,320,320,3
+
+
+py -3.6 model_main_tf2.py \ --model_dir=C:/Hansel/mlsmall/ --num_train_steps=400002 \ --sample_1_of_n_eval_examples=1 \ --pipeline_config_path=C:/Hansel/mlsmall/pipeline.config \ --alsologtostderr
+
+
+C:\Hansel\models\20210609-135707
+--graph_def_file=C:/Hansel/models/20210609-135707/saved_model.pb
+
+py -3.6 C:/Hansel/tensorflow1155/tensorflow/lite/python/tflite_convert.py \ --saved_model_dir=C:/Hansel/mlsmall \  --output_file=C:/Hansel/mlsmall/hasiltflite.tflite \ --output_format=TFLITE \ --input_shapes=1,224,224,3 \ --input_arrays=normalized_input_image_tensor \ --output_arrays='TFLite_Detection_PostProcess','TFLite_Detection_PostProcess:1','TFLite_Detection_PostProcess:2','TFLite_Detection_PostProcess:3' \  --inference_type=QUANTIZED_UINT8 \ --mean_values=128 \ --std_dev_values=128 \ --change_concat_input_ranges=false \ --allow_custom_ops
+
+py -3.6 C:/Hansel/tensorflow1155/tensorflow/python\tools/saved_model_cli.py show --dir C:/Hansel/mlsmall
+
